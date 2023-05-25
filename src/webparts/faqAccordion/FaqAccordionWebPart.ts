@@ -10,13 +10,10 @@ import { IReadonlyTheme } from '@microsoft/sp-component-base';
 
 import * as strings from 'FaqAccordionWebPartStrings';
 import FaqAccordion from './components/FaqAccordion';
-import { IFaqAccordionProps } from './components/IFaqAccordionProps';
-
-export interface IFaqAccordionWebPartProps {
-  description: string;
-  siteUrl: string;      // URL of the SharePoint site.
-  listName: string;     // Name of the SharePoint list.
-}
+import { IFaqAccordionProps, IFaqAccordionWebPartProps } from './components/IFaqAccordionProps';
+import { getSP, getSiteSP } from '../../pnpjs-config';
+import "@pnp/sp/sites";
+import Loading from './components/Loading';
 
 export default class FaqAccordionWebPart extends BaseClientSideWebPart<IFaqAccordionWebPartProps> {
 
@@ -30,6 +27,8 @@ export default class FaqAccordionWebPart extends BaseClientSideWebPart<IFaqAccor
         description: this.properties.description,
         siteUrl: this.properties.siteUrl,
         listName: this.properties.listName,
+        questionFieldName: this.properties.questionFieldName,
+        answerFieldName: this.properties.answerFieldName,
         isDarkTheme: this._isDarkTheme,
         environmentMessage: this._environmentMessage,
         hasTeamsContext: !!this.context.sdks.microsoftTeams,
@@ -37,13 +36,26 @@ export default class FaqAccordionWebPart extends BaseClientSideWebPart<IFaqAccor
       }
     );
 
-    ReactDom.render(element, this.domElement);
+    const loadingElement: React.ReactElement<any> = React.createElement(Loading);
+
+    if (this.properties.siteUrl && this.properties.listName)
+      ReactDom.render(element, this.domElement);
+    else
+      ReactDom.render(loadingElement, this.domElement);
   }
 
-  protected onInit(): Promise<void> {
-    return this._getEnvironmentMessage().then(message => {
-      this._environmentMessage = message;
-    });
+  protected async onInit(): Promise<void> {
+    this._environmentMessage = await this._getEnvironmentMessage();
+
+    super.onInit();
+
+    //Initialize our _sp object that we can then use in other packages without having to pass around the context.
+    //  Check out pnpjsConfig.ts for an example of a project setup file.
+    getSP(this.context);
+
+    if (this.properties.siteUrl) {
+      getSiteSP(this.context, this.properties.siteUrl);
+    }
   }
 
   private _getEnvironmentMessage(): Promise<string> {
@@ -97,13 +109,33 @@ export default class FaqAccordionWebPart extends BaseClientSideWebPart<IFaqAccor
     return Version.parse('1.0');
   }
 
-  private _validatePropertyPane(value: string): string {
-    if (value === null ||
-      value.trim().length === 0) {
-      return 'Provide an input.';
-    }
+  private async _validatePropertyPaneList(listName: string): Promise<string> {
+    const listURL = `${this.properties.siteUrl}/Lists/${listName}`;
+    const errorMessage = `Cannot locate the list '${listURL}'...`;
+    try {
+      // This will throw an error if the list does not exist.       
+      await getSiteSP().web.lists.getByTitle(listName)();
 
-    return '';
+      return "";
+    } catch (error) {
+      return errorMessage;
+    }
+  }
+
+  private async _validatePropertyPaneSite(siteUrl: string): Promise<string> {
+    const errorMessage = `Cannot locate Site '${siteUrl}'...`
+    try {
+      const site = await getSP().site.exists(siteUrl);
+      if (site) {
+        getSiteSP(this.context, siteUrl);
+        return '';
+      }
+      else {
+        return errorMessage;
+      }
+    } catch (error) {
+      return errorMessage;
+    }
   }
 
   protected getPropertyPaneConfiguration(): IPropertyPaneConfiguration {
@@ -112,15 +144,23 @@ export default class FaqAccordionWebPart extends BaseClientSideWebPart<IFaqAccor
         {
           groups: [
             {
-              groupName: "SharePoint List",
               groupFields: [
+                PropertyPaneTextField('description', {
+                  label: "Description"
+                }),
                 PropertyPaneTextField('siteUrl', {
                   label: "Site URL",
-                  onGetErrorMessage: this._validatePropertyPane.bind(this),
+                  onGetErrorMessage: this._validatePropertyPaneSite.bind(this),
                 }),
                 PropertyPaneTextField('listName', {
                   label: "List Name",
-                  onGetErrorMessage: this._validatePropertyPane.bind(this),
+                  onGetErrorMessage: this._validatePropertyPaneList.bind(this),
+                }),
+                PropertyPaneTextField('questionFieldName', {
+                  label: "Question Field Name"
+                }),
+                PropertyPaneTextField('answerFieldName', {
+                  label: "Answer Field Name"
                 }),
               ]
             }
