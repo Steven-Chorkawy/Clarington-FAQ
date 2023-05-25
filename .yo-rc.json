@@ -1,0 +1,21 @@
+{
+  "@microsoft/generator-sharepoint": {
+    "plusBeta": false,
+    "isCreatingSolution": true,
+    "nodeVersion": "16.18.1",
+    "sdksVersions": {
+      "@microsoft/microsoft-graph-client": "3.0.2",
+      "@microsoft/teams-js": "2.9.1"
+    },
+    "version": "1.17.2",
+    "libraryName": "clarington-faq",
+    "libraryId": "be13e6b7-0a2b-4420-867a-20626dbf7c70",
+    "environment": "spo",
+    "packageManager": "npm",
+    "solutionName": "Clarington-FAQ",
+    "solutionShortDescription": "Clarington-FAQ description",
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "componentType": "webpart"
+  }
+}

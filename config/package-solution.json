@@ -1,0 +1,40 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
+  "solution": {
+    "name": "clarington-faq-client-side-solution",
+    "id": "be13e6b7-0a2b-4420-867a-20626dbf7c70",
+    "version": "1.0.0.0",
+    "includeClientSideAssets": true,
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "developer": {
+      "name": "",
+      "websiteUrl": "",
+      "privacyUrl": "",
+      "termsOfUseUrl": "",
+      "mpnId": "Undefined-1.17.2"
+    },
+    "metadata": {
+      "shortDescription": {
+        "default": "Clarington-FAQ description"
+      },
+      "longDescription": {
+        "default": "Clarington-FAQ description"
+      },
+      "screenshotPaths": [],
+      "videoUrl": "",
+      "categories": []
+    },
+    "features": [
+      {
+        "title": "clarington-faq Feature",
+        "description": "The feature that activates elements of the clarington-faq solution.",
+        "id": "4016076c-7f04-4ecc-aa11-583acc96880f",
+        "version": "1.0.0.0"
+      }
+    ]
+  },
+  "paths": {
+    "zippedPackage": "solution/clarington-faq.sppkg"
+  }
+}
