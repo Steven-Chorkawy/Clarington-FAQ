@@ -145,6 +145,9 @@ export default class FaqAccordionWebPart extends BaseClientSideWebPart<IFaqAccor
           groups: [
             {
               groupFields: [
+                PropertyPaneTextField('description', {
+                  label: "Description"
+                }),
                 PropertyPaneTextField('siteUrl', {
                   label: "Site URL",
                   onGetErrorMessage: this._validatePropertyPaneSite.bind(this),
