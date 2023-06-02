@@ -17,16 +17,16 @@ export default class FaqAccordion extends React.Component<IFaqAccordionProps, an
     this._queryList();
   }
 
-  private async _queryList(): Promise<void> {
-    getSiteSP().web.lists.getByTitle(this.props.listName).items().then(value => {
-      this.setState({ items: value });
-    });
+  private async _queryList(): Promise<any> {
+    return await getSiteSP().web.lists.getByTitle(this.props.listName).items();
   }
 
   componentDidUpdate(prevProps: Readonly<IFaqAccordionProps>, prevState: Readonly<any>, snapshot?: any): void {
     if (this.props.siteUrl !== prevProps.siteUrl ||
       this.props.listName !== prevProps.listName) {
-      this._queryList();
+      this._queryList().then(value => {
+        this.setState({ items: value });
+      });
     }
   }
 
