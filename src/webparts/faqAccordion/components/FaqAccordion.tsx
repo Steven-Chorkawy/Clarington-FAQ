@@ -14,19 +14,36 @@ export default class FaqAccordion extends React.Component<IFaqAccordionProps, an
     this.state = {
       items: undefined
     };
-    this._queryList();
+    this._queryAndSetListState();
   }
 
+  /**
+   * Query a given SharePoint list to populate the accordion webpart.
+   * @returns List items
+   */
   private async _queryList(): Promise<any> {
     return await getSiteSP().web.lists.getByTitle(this.props.listName).items();
+  }
+
+  /**
+   * Call the main query method and set the results in the state.
+   */
+  private _queryAndSetListState(): void {
+    this._queryList()
+      .then(value => {
+        this.setState({ items: value });
+      })
+      .catch(value => {
+        console.log(value);
+        this.setState({ items: [] });
+        alert('Failed to load list for Q&A webpart!');
+      });
   }
 
   componentDidUpdate(prevProps: Readonly<IFaqAccordionProps>, prevState: Readonly<any>, snapshot?: any): void {
     if (this.props.siteUrl !== prevProps.siteUrl ||
       this.props.listName !== prevProps.listName) {
-      this._queryList().then(value => {
-        this.setState({ items: value });
-      });
+      this._queryAndSetListState();
     }
   }
 

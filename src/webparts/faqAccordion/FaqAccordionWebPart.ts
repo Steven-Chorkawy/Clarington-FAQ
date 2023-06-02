@@ -38,16 +38,21 @@ export default class FaqAccordionWebPart extends BaseClientSideWebPart<IFaqAccor
 
     const loadingElement: React.ReactElement<any> = React.createElement(Loading);
 
+    let outputElement = undefined;
+
+
     if (this.properties.siteUrl && this.properties.listName)
-      ReactDom.render(element, this.domElement);
+      outputElement = element;
     else
-      ReactDom.render(loadingElement, this.domElement);
+      outputElement = loadingElement
+
+    ReactDom.render(outputElement, this.domElement);
   }
 
   protected async onInit(): Promise<void> {
     this._environmentMessage = await this._getEnvironmentMessage();
 
-    super.onInit();
+    await super.onInit();
 
     //Initialize our _sp object that we can then use in other packages without having to pass around the context.
     //  Check out pnpjsConfig.ts for an example of a project setup file.
