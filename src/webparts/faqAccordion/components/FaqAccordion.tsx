@@ -48,21 +48,13 @@ export default class FaqAccordion extends React.Component<IFaqAccordionProps, an
   }
 
   public render(): React.ReactElement<IFaqAccordionProps> {
-    // let sampleItems: any = [
-    //   { Question: "Q1", Response: "R1" },
-    //   { Question: "Q2", Response: "R2" },
-    //   { Question: "Q3", Response: "R3" },
-    //   { Question: "Q4", Response: "R4" },
-    //   { Question: "Q5", Response: "R5" },
-    //   { Question: "Q6", Response: "R6" },
-    // ];
     if (this.state.items === undefined) {
       return <div>Loading...</div>;
     }
     else {
       return (
         <div>
-          <h2>{this.props.description}</h2>
+          <h2>{this.props.webPartTitle}</h2>
           {this.state.items.map((item: any, index: number) => (
             <Accordion title={item[this.props.questionFieldName]} defaultCollapsed={true} className={"itemCell"} key={index}>
               <div className={"itemContent"}>

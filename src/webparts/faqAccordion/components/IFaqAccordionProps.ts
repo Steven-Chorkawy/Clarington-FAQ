@@ -1,5 +1,5 @@
 export interface IFaqAccordionWebPartProps {
-  description: string;
+  webPartTitle: string;
   siteUrl: string;        // URL of the SharePoint site.
   listName: string;       // Name of the SharePoint list.
   questionFieldName: string;  // Name of the Question field.

@@ -22,7 +22,7 @@
     "description": { "default": "FAQ Accordion description" },
     "officeFabricIconFontName": "Page",
     "properties": {
-      "description": "FAQ Accordion"
+      "webPartTitle": "FAQ Accordion"
     }
   }]
 }

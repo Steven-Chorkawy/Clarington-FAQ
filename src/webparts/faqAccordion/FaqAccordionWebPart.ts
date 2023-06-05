@@ -14,17 +14,20 @@ import { IFaqAccordionProps, IFaqAccordionWebPartProps } from './components/IFaq
 import { getSP, getSiteSP } from '../../pnpjs-config';
 import "@pnp/sp/sites";
 import Loading from './components/Loading';
+import { PropertyPaneAsyncDropdown } from '../../controls/PropertyPaneAsyncDropDown/PropertyPaneAsyncDropdown';
 
 export default class FaqAccordionWebPart extends BaseClientSideWebPart<IFaqAccordionWebPartProps> {
 
   private _isDarkTheme: boolean = false;
   private _environmentMessage: string = '';
+  private siteNameDropDown: PropertyPaneAsyncDropdown;
+  private listNameDropDown: PropertyPaneAsyncDropdown;
 
   public render(): void {
     const element: React.ReactElement<IFaqAccordionProps> = React.createElement(
       FaqAccordion,
       {
-        description: this.properties.description,
+        webPartTitle: this.properties.webPartTitle,
         siteUrl: this.properties.siteUrl,
         listName: this.properties.listName,
         questionFieldName: this.properties.questionFieldName,
@@ -144,14 +147,24 @@ export default class FaqAccordionWebPart extends BaseClientSideWebPart<IFaqAccor
   }
 
   protected getPropertyPaneConfiguration(): IPropertyPaneConfiguration {
+    // reference to item dropdown needed later after selecting a list
+    this.siteNameDropDown = new PropertyPaneAsyncDropdown('item', {
+      label: strings.ItemFieldLabel,
+      loadOptions: this.loadItems.bind(this),
+      onPropertyChange: this.onListItemChange.bind(this),
+      selectedKey: this.properties.item,
+      // should be disabled if no list has been selected
+      disabled: !this.properties.listName
+    });
+
     return {
       pages: [
         {
           groups: [
             {
               groupFields: [
-                PropertyPaneTextField('description', {
-                  label: "Description"
+                PropertyPaneTextField('webPartTitle', {
+                  label: "Web Part Title"
                 }),
                 PropertyPaneTextField('siteUrl', {
                   label: "Site URL",
