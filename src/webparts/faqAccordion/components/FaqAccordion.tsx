@@ -3,7 +3,8 @@ import { IFaqAccordionProps } from './IFaqAccordionProps';
 import { Accordion } from '@pnp/spfx-controls-react';
 import { getSiteSP } from '../../../pnpjs-config';
 import { RichText } from "@pnp/spfx-controls-react/lib/RichText";
-
+import "@pnp/sp/items/get-all";
+import "@pnp/sp/taxonomy";
 
 export default class FaqAccordion extends React.Component<IFaqAccordionProps, any> {
 
@@ -18,7 +19,7 @@ export default class FaqAccordion extends React.Component<IFaqAccordionProps, an
   }
 
   private async _queryList(): Promise<void> {
-    getSiteSP().web.lists.getByTitle(this.props.listName).items().then(value => {
+    getSiteSP().web.lists.getByTitle(this.props.listName).items.getAll().then(value => {
       this.setState({ items: value });
     });
   }
@@ -31,14 +32,6 @@ export default class FaqAccordion extends React.Component<IFaqAccordionProps, an
   }
 
   public render(): React.ReactElement<IFaqAccordionProps> {
-    // let sampleItems: any = [
-    //   { Question: "Q1", Response: "R1" },
-    //   { Question: "Q2", Response: "R2" },
-    //   { Question: "Q3", Response: "R3" },
-    //   { Question: "Q4", Response: "R4" },
-    //   { Question: "Q5", Response: "R5" },
-    //   { Question: "Q6", Response: "R6" },
-    // ];
     if (this.state.items === undefined) {
       return <div>Loading...</div>;
     }
