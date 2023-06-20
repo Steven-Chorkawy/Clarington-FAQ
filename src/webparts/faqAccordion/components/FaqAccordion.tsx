@@ -83,7 +83,7 @@ export default class FaqAccordion extends React.Component<IFaqAccordionProps, an
     console.log('value is ' + newValue);
     let newListItems;
     if (newValue) {
-      newListItems = filterBy(this.state.items, {
+      newListItems = filterBy(this.state.allItems, {
         logic: "or",
         filters: [
           { field: this.props.questionFieldName, operator: "contains", value: newValue },
