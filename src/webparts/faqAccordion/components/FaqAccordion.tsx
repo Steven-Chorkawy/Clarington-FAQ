@@ -57,6 +57,7 @@ export default class FaqAccordion extends React.Component<IFaqAccordionProps, an
       this._queryDepartmentName(item.Department?.TermGuid);
     });
 
+    // Sort by Created date.  Newest to Oldest.
     let sortedList = listItems.sort((p1, p2) => (p1.Created < p2.Created) ? 1 : (p1.Created > p2.Created) ? -1 : 0);
 
     this.setState({ items: sortedList });
