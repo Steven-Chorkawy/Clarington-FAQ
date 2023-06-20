@@ -65,7 +65,10 @@ export default class FaqAccordion extends React.Component<IFaqAccordionProps, an
     // Sort by Created date.  Newest to Oldest.
     let sortedList = listItems.sort((p1, p2) => (p1.Created < p2.Created) ? 1 : (p1.Created > p2.Created) ? -1 : 0);
 
-    this.setState({ items: sortedList });
+    this.setState({
+      items: sortedList,    // items that will be rendered. 
+      allItems: sortedList  // All items regardless of current filters.
+    });
   }
 
   componentDidUpdate(prevProps: Readonly<IFaqAccordionProps>, prevState: Readonly<any>, snapshot?: any): void {
@@ -75,6 +78,11 @@ export default class FaqAccordion extends React.Component<IFaqAccordionProps, an
     }
   }
 
+  private _onSearch(newValue: string): void {
+    console.log('value is ' + newValue)
+  }
+
+
   public render(): React.ReactElement<IFaqAccordionProps> {
     if (this.state.items === undefined) {
       return <div>Loading...</div>;
@@ -83,7 +91,7 @@ export default class FaqAccordion extends React.Component<IFaqAccordionProps, an
       return (
         <div>
           <h2>{this.props.description}</h2>
-          <SearchBox placeholder="This Search Box Does Not Work Yet..." onSearch={newValue => console.log('value is ' + newValue)} />
+          <SearchBox placeholder="This Search Box Does Not Work Yet..." onSearch={this._onSearch} />
           {this.state.items.map((item: any, index: number) => (
             <ExpansionPanel
               title={item[this.props.questionFieldName]}
