@@ -1,10 +1,17 @@
 import * as React from 'react';
 import { IFaqAccordionProps } from './IFaqAccordionProps';
-import { Accordion } from '@pnp/spfx-controls-react';
 import { getSiteSP } from '../../../pnpjs-config';
 import { RichText } from "@pnp/spfx-controls-react/lib/RichText";
 import "@pnp/sp/items/get-all";
 import "@pnp/sp/taxonomy";
+import { ExpansionPanel, ExpansionPanelActionEvent, ExpansionPanelContent } from '@progress/kendo-react-layout';
+import { Reveal } from '@progress/kendo-react-animation';
+import "@pnp/sp/taxonomy";
+import { SearchBox } from 'office-ui-fabric-react';
+import { filterBy } from '@progress/kendo-data-query';
+
+const MOC_ORG_GROUP_ID = '4026b60c-6222-432f-b07d-89c2396e8e64';
+const DEPARTMENT_TERM_SET_ID = '8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f';
 
 export default class FaqAccordion extends React.Component<IFaqAccordionProps, any> {
 
@@ -13,14 +20,55 @@ export default class FaqAccordion extends React.Component<IFaqAccordionProps, an
     console.log('ctor');
     console.log(props);
     this.state = {
-      items: undefined
+      items: undefined,
     };
     this._queryList();
   }
 
+  // TODO: This method should query any managed metadata field not just a department field.
+  private async _queryDepartmentName(termID: string): Promise<void> {
+    if (!termID)
+      return;
+
+    // check if state has already been set. 
+    if (this.state[termID]) {
+      console.log(`${termID} has already been found: ${this.state[termID]}`);
+    }
+    else {
+      console.log(`${termID} NOT FOUND!`);
+      let res = await getSiteSP().termStore.groups.getById(MOC_ORG_GROUP_ID).sets.getById(DEPARTMENT_TERM_SET_ID).getTermById(termID)();
+
+      if (res.labels) {
+        if (res.labels.length > 0) {
+          // There should only ever be one item in this array so just get the first one.
+          this.setState({ [termID]: res.labels[0].name });
+
+          // Replace the Department object with a simple string of the department name.  
+          // This will make searching and rendering this info much easier.
+          this.state.items.map((item: any, index: number) => {
+            if (item.Department?.TermGuid === termID) {
+              item.DepartmentDate = { ...item.Department }
+              item.Department = res.labels[0].name
+            }
+          });
+        }
+      }
+    }
+  }
+
   private async _queryList(): Promise<void> {
-    getSiteSP().web.lists.getByTitle(this.props.listName).items.getAll().then(value => {
-      this.setState({ items: value });
+    const listItems = await getSiteSP().web.lists.getByTitle(this.props.listName).items.getAll();
+
+    listItems.forEach(item => {
+      this._queryDepartmentName(item.Department?.TermGuid);
+    });
+
+    // Sort by Created date.  Newest to Oldest.
+    const sortedList = listItems.sort((p1, p2) => (p1.Created < p2.Created) ? 1 : (p1.Created > p2.Created) ? -1 : 0);
+
+    this.setState({
+      items: sortedList,    // items that will be rendered. 
+      allItems: sortedList  // All items regardless of current filters.
     });
   }
 
@@ -31,6 +79,28 @@ export default class FaqAccordion extends React.Component<IFaqAccordionProps, an
     }
   }
 
+  private _onSearch = (newValue: string): void => {
+    console.log('value is ' + newValue);
+    let newListItems;
+    if (newValue) {
+      newListItems = filterBy(this.state.items, {
+        logic: "or",
+        filters: [
+          { field: this.props.questionFieldName, operator: "contains", value: newValue },
+          { field: this.props.answerFieldName, operator: "contains", value: newValue },
+          { field: this.props.subtitleFieldName, operator: "contains", value: newValue },
+          { field: 'Topic', operator: "contains", value: newValue },
+        ]
+      });
+    }
+    else {
+      newListItems = this.state.allItems;
+    }
+
+    debugger;
+    this.setState({ items: newListItems });
+  }
+
   public render(): React.ReactElement<IFaqAccordionProps> {
     if (this.state.items === undefined) {
       return <div>Loading...</div>;
@@ -39,14 +109,35 @@ export default class FaqAccordion extends React.Component<IFaqAccordionProps, an
       return (
         <div>
           <h2>{this.props.description}</h2>
+          <SearchBox placeholder={`Search by Question, Answer, Department, or Topic.`} onChange={(event, newValue) => this._onSearch(newValue)} />
           {this.state.items.map((item: any, index: number) => (
-            <Accordion title={item[this.props.questionFieldName]} defaultCollapsed={true} className={"itemCell"} key={index}>
-              <div className={"itemContent"}>
-                <div className={"itemResponse"}>
-                  <RichText value={item[this.props.answerFieldName]} isEditMode={false} />
-                </div>
-              </div>
-            </Accordion>
+            <ExpansionPanel
+              title={item[this.props.questionFieldName]}
+              // subtitle={this.props.subtitleFieldName && <div style={{ textAlign: 'right' }}>{item[this.props.subtitleFieldName]}</div>}
+              subtitle={
+                this.props.subtitleFieldName &&
+                typeof item[this.props.subtitleFieldName] === "string" &&
+                <div style={{ textAlign: 'right' }}>{item[this.props.subtitleFieldName]}</div>
+              }
+              expanded={this.state.expanded === item.ID}
+              tabIndex={0}
+              key={item.ID}
+              onAction={(event: ExpansionPanelActionEvent) => {
+                this.setState({ expanded: event.expanded ? "" : item.ID });
+              }}
+            >
+              <Reveal>
+                {this.state.expanded === item.ID && (
+                  <ExpansionPanelContent>
+                    <div className="content">
+                      <span className="content-text">
+                        <RichText value={item[this.props.answerFieldName]} isEditMode={false} />
+                      </span>
+                    </div>
+                  </ExpansionPanelContent>
+                )}
+              </Reveal>
+            </ExpansionPanel>
           ))}
         </div>
       );

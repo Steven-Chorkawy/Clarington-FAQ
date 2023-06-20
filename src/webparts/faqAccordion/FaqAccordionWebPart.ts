@@ -14,6 +14,7 @@ import { IFaqAccordionProps, IFaqAccordionWebPartProps } from './components/IFaq
 import { getSP, getSiteSP } from '../../pnpjs-config';
 import "@pnp/sp/sites";
 import Loading from './components/Loading';
+import '@progress/kendo-theme-fluent/dist/all.css'
 
 export default class FaqAccordionWebPart extends BaseClientSideWebPart<IFaqAccordionWebPartProps> {
 
@@ -29,6 +30,7 @@ export default class FaqAccordionWebPart extends BaseClientSideWebPart<IFaqAccor
         listName: this.properties.listName,
         questionFieldName: this.properties.questionFieldName,
         answerFieldName: this.properties.answerFieldName,
+        subtitleFieldName: this.properties.subtitleFieldName,
         isDarkTheme: this._isDarkTheme,
         environmentMessage: this._environmentMessage,
         hasTeamsContext: !!this.context.sdks.microsoftTeams,
@@ -161,6 +163,9 @@ export default class FaqAccordionWebPart extends BaseClientSideWebPart<IFaqAccor
                 }),
                 PropertyPaneTextField('answerFieldName', {
                   label: "Answer Field Name"
+                }),
+                PropertyPaneTextField('subtitleFieldName', {
+                  label: "Subtitle Field Name"
                 }),
               ]
             }
