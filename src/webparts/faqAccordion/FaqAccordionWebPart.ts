@@ -14,6 +14,7 @@ import { IFaqAccordionProps, IFaqAccordionWebPartProps } from './components/IFaq
 import { getSP, getSiteSP } from '../../pnpjs-config';
 import "@pnp/sp/sites";
 import Loading from './components/Loading';
+import '@progress/kendo-theme-fluent/dist/all.css'
 
 export default class FaqAccordionWebPart extends BaseClientSideWebPart<IFaqAccordionWebPartProps> {
 

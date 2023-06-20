@@ -27,6 +27,7 @@
     "@progress/kendo-react-animation": "^5.14.1",
     "@progress/kendo-react-buttons": "^5.14.1",
     "@progress/kendo-react-layout": "^5.14.1",
+    "@progress/kendo-theme-fluent": "^6.4.0",
     "office-ui-fabric-react": "^7.199.1",
     "react": "17.0.1",
     "react-dom": "17.0.1",
