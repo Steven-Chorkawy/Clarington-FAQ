@@ -5,6 +5,8 @@ import { getSiteSP } from '../../../pnpjs-config';
 import { RichText } from "@pnp/spfx-controls-react/lib/RichText";
 import "@pnp/sp/items/get-all";
 import "@pnp/sp/taxonomy";
+import { ExpansionPanel, ExpansionPanelActionEvent, ExpansionPanelContent } from '@progress/kendo-react-layout';
+import { Reveal } from '@progress/kendo-react-animation';
 
 export default class FaqAccordion extends React.Component<IFaqAccordionProps, any> {
 
@@ -40,13 +42,40 @@ export default class FaqAccordion extends React.Component<IFaqAccordionProps, an
         <div>
           <h2>{this.props.description}</h2>
           {this.state.items.map((item: any, index: number) => (
-            <Accordion title={item[this.props.questionFieldName]} defaultCollapsed={true} className={"itemCell"} key={index}>
-              <div className={"itemContent"}>
-                <div className={"itemResponse"}>
-                  <RichText value={item[this.props.answerFieldName]} isEditMode={false} />
-                </div>
-              </div>
-            </Accordion>
+            <ExpansionPanel
+            title={item.country}
+            subtitle={item.continent}
+            // expand none by default. 
+            //expanded={this.state.expanded === item.id}
+            tabIndex={0}
+            key={item.id}
+            onAction={(event: ExpansionPanelActionEvent) => {
+              this.setState({ expanded: event.expanded ? "" : item.id });
+            }}
+          >
+            <Reveal>
+              {this.state.expanded === item.id && (
+                <ExpansionPanelContent>
+                  <div className="content">
+                    <div className="image-container">
+                      <img
+                        src={item.imageUrl}
+                        alt={`KendoReact Layout ${item.country}`}
+                      />
+                    </div>
+                    <span className="content-text">{item.text}</span>
+                  </div>
+                </ExpansionPanelContent>
+              )}
+            </Reveal>
+          </ExpansionPanel>
+            // <Accordion title={item[this.props.questionFieldName]} defaultCollapsed={true} className={"itemCell"} key={index}>
+            //   <div className={"itemContent"}>
+            //     <div className={"itemResponse"}>
+            //       <RichText value={item[this.props.answerFieldName]} isEditMode={false} />
+            //     </div>
+            //   </div>
+            // </Accordion>
           ))}
         </div>
       );
