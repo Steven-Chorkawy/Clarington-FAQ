@@ -24,6 +24,7 @@ export default class FaqAccordion extends React.Component<IFaqAccordionProps, an
     this._queryList();
   }
 
+  // TODO: This method should query any managed metadata field not just a department field.
   private async _queryDepartmentName(termID: string): Promise<void> {
     if (!termID)
       return;
