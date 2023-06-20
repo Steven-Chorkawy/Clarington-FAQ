@@ -8,6 +8,7 @@ import { ExpansionPanel, ExpansionPanelActionEvent, ExpansionPanelContent } from
 import { Reveal } from '@progress/kendo-react-animation';
 import "@pnp/sp/taxonomy";
 import { SearchBox } from 'office-ui-fabric-react';
+import { filterBy } from '@progress/kendo-data-query';
 
 const MOC_ORG_GROUP_ID = '4026b60c-6222-432f-b07d-89c2396e8e64';
 const DEPARTMENT_TERM_SET_ID = '8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f';
@@ -19,7 +20,7 @@ export default class FaqAccordion extends React.Component<IFaqAccordionProps, an
     console.log('ctor');
     console.log(props);
     this.state = {
-      items: undefined
+      items: undefined,
     };
     this._queryList();
   }
@@ -56,14 +57,14 @@ export default class FaqAccordion extends React.Component<IFaqAccordionProps, an
   }
 
   private async _queryList(): Promise<void> {
-    let listItems = await getSiteSP().web.lists.getByTitle(this.props.listName).items.getAll();
+    const listItems = await getSiteSP().web.lists.getByTitle(this.props.listName).items.getAll();
 
     listItems.forEach(item => {
       this._queryDepartmentName(item.Department?.TermGuid);
     });
 
     // Sort by Created date.  Newest to Oldest.
-    let sortedList = listItems.sort((p1, p2) => (p1.Created < p2.Created) ? 1 : (p1.Created > p2.Created) ? -1 : 0);
+    const sortedList = listItems.sort((p1, p2) => (p1.Created < p2.Created) ? 1 : (p1.Created > p2.Created) ? -1 : 0);
 
     this.setState({
       items: sortedList,    // items that will be rendered. 
@@ -78,10 +79,27 @@ export default class FaqAccordion extends React.Component<IFaqAccordionProps, an
     }
   }
 
-  private _onSearch(newValue: string): void {
-    console.log('value is ' + newValue)
-  }
+  private _onSearch = (newValue: string): void => {
+    console.log('value is ' + newValue);
+    let newListItems;
+    if (newValue) {
+      newListItems = filterBy(this.state.items, {
+        logic: "or",
+        filters: [
+          { field: this.props.questionFieldName, operator: "contains", value: newValue },
+          { field: this.props.answerFieldName, operator: "contains", value: newValue },
+          { field: this.props.subtitleFieldName, operator: "contains", value: newValue },
+          { field: 'Topic', operator: "contains", value: newValue },
+        ]
+      });
+    }
+    else {
+      newListItems = this.state.allItems;
+    }
 
+    debugger;
+    this.setState({ items: newListItems });
+  }
 
   public render(): React.ReactElement<IFaqAccordionProps> {
     if (this.state.items === undefined) {
@@ -91,7 +109,7 @@ export default class FaqAccordion extends React.Component<IFaqAccordionProps, an
       return (
         <div>
           <h2>{this.props.description}</h2>
-          <SearchBox placeholder="This Search Box Does Not Work Yet..." onSearch={this._onSearch} />
+          <SearchBox placeholder={`Search by Question, Answer, Department, or Topic.`} onChange={(event, newValue) => this._onSearch(newValue)} />
           {this.state.items.map((item: any, index: number) => (
             <ExpansionPanel
               title={item[this.props.questionFieldName]}
