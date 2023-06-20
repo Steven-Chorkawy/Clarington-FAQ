@@ -7,6 +7,7 @@ import "@pnp/sp/taxonomy";
 import { ExpansionPanel, ExpansionPanelActionEvent, ExpansionPanelContent } from '@progress/kendo-react-layout';
 import { Reveal } from '@progress/kendo-react-animation';
 import "@pnp/sp/taxonomy";
+import { SearchBox } from 'office-ui-fabric-react';
 
 const MOC_ORG_GROUP_ID = '4026b60c-6222-432f-b07d-89c2396e8e64';
 const DEPARTMENT_TERM_SET_ID = '8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f';
@@ -40,9 +41,12 @@ export default class FaqAccordion extends React.Component<IFaqAccordionProps, an
           // There should only ever be one item in this array so just get the first one.
           this.setState({ [termID]: res.labels[0].name });
 
+          // Replace the Department object with a simple string of the department name.  
+          // This will make searching and rendering this info much easier.
           this.state.items.map((item: any, index: number) => {
             if (item.Department?.TermGuid === termID) {
-              item.Department = { ...item.Department, Name: res.labels[0].name }
+              item.DepartmentDate = { ...item.Department }
+              item.Department = res.labels[0].name
             }
           });
         }
@@ -78,10 +82,16 @@ export default class FaqAccordion extends React.Component<IFaqAccordionProps, an
       return (
         <div>
           <h2>{this.props.description}</h2>
+          <SearchBox placeholder="This Search Box Does Not Work Yet..." onSearch={newValue => console.log('value is ' + newValue)} />
           {this.state.items.map((item: any, index: number) => (
             <ExpansionPanel
               title={item[this.props.questionFieldName]}
-              subtitle={<div style={{ textAlign: 'right' }}>{item.Department?.Name}</div>}
+              // subtitle={this.props.subtitleFieldName && <div style={{ textAlign: 'right' }}>{item[this.props.subtitleFieldName]}</div>}
+              subtitle={
+                this.props.subtitleFieldName &&
+                typeof item[this.props.subtitleFieldName] === "string" &&
+                <div style={{ textAlign: 'right' }}>{item[this.props.subtitleFieldName]}</div>
+              }
               expanded={this.state.expanded === item.ID}
               tabIndex={0}
               key={item.ID}

@@ -30,6 +30,7 @@ export default class FaqAccordionWebPart extends BaseClientSideWebPart<IFaqAccor
         listName: this.properties.listName,
         questionFieldName: this.properties.questionFieldName,
         answerFieldName: this.properties.answerFieldName,
+        subtitleFieldName: this.properties.subtitleFieldName,
         isDarkTheme: this._isDarkTheme,
         environmentMessage: this._environmentMessage,
         hasTeamsContext: !!this.context.sdks.microsoftTeams,
@@ -162,6 +163,9 @@ export default class FaqAccordionWebPart extends BaseClientSideWebPart<IFaqAccor
                 }),
                 PropertyPaneTextField('answerFieldName', {
                   label: "Answer Field Name"
+                }),
+                PropertyPaneTextField('subtitleFieldName', {
+                  label: "Subtitle Field Name"
                 }),
               ]
             }
