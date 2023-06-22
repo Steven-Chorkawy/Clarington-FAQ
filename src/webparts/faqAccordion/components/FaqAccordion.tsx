@@ -7,8 +7,9 @@ import "@pnp/sp/taxonomy";
 import { ExpansionPanel, ExpansionPanelActionEvent, ExpansionPanelContent } from '@progress/kendo-react-layout';
 import { Reveal } from '@progress/kendo-react-animation';
 import "@pnp/sp/taxonomy";
-import { SearchBox } from 'office-ui-fabric-react';
+import { Link, MessageBar, MessageBarType, SearchBox } from 'office-ui-fabric-react';
 import { filterBy } from '@progress/kendo-data-query';
+import { PermissionKind } from "@pnp/sp/security";
 
 const MOC_ORG_GROUP_ID = '4026b60c-6222-432f-b07d-89c2396e8e64';
 const DEPARTMENT_TERM_SET_ID = '8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f';
@@ -17,12 +18,17 @@ export default class FaqAccordion extends React.Component<IFaqAccordionProps, an
 
   constructor(props: any) {
     super(props);
-    console.log('ctor');
-    console.log(props);
     this.state = {
       items: undefined,
     };
     this._queryList();
+
+    // Check users permissions. 
+    getSiteSP().web.lists.getByTitle('FAQ').currentUserHasPermissions(PermissionKind.EditListItems).then((value) => {
+      this.setState({
+        canUserEditListItems: value
+      });
+    });
   }
 
   // TODO: This method should query any managed metadata field not just a department field.
@@ -31,11 +37,7 @@ export default class FaqAccordion extends React.Component<IFaqAccordionProps, an
       return;
 
     // check if state has already been set. 
-    if (this.state[termID]) {
-      console.log(`${termID} has already been found: ${this.state[termID]}`);
-    }
-    else {
-      console.log(`${termID} NOT FOUND!`);
+    if (!this.state[termID]) {
       let res = await getSiteSP().termStore.groups.getById(MOC_ORG_GROUP_ID).sets.getById(DEPARTMENT_TERM_SET_ID).getTermById(termID)();
 
       if (res.labels) {
@@ -80,7 +82,6 @@ export default class FaqAccordion extends React.Component<IFaqAccordionProps, an
   }
 
   private _onSearch = (newValue: string): void => {
-    console.log('value is ' + newValue);
     let newListItems;
     if (newValue) {
       newListItems = filterBy(this.state.allItems, {
@@ -131,6 +132,17 @@ export default class FaqAccordion extends React.Component<IFaqAccordionProps, an
                   <ExpansionPanelContent>
                     <div className="content">
                       <span className="content-text">
+                        {
+                          this.state.canUserEditListItems &&
+                          <div>
+                            <MessageBar messageBarType={MessageBarType.success} isMultiline={false}>
+                              You have permissions to edit this list item.
+                              <Link href={`${this.props.siteUrl}/Lists/${this.props.listName}/EditForm.aspx?ID=${item.ID}`} target="_blank" underline>
+                                Click Here to Edit Item.
+                              </Link>
+                            </MessageBar>
+                          </div>
+                        }
                         <RichText value={item[this.props.answerFieldName]} isEditMode={false} />
                       </span>
                     </div>
