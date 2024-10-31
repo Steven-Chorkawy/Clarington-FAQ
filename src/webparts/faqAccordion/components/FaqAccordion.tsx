@@ -25,7 +25,7 @@ export default class FaqAccordion extends React.Component<IFaqAccordionProps, an
     this._queryList().then().catch(reason => console.error(reason));
 
     // Check users permissions. 
-    getSiteSP().web.lists.getByTitle('FAQ').currentUserHasPermissions(PermissionKind.EditListItems).then((value) => {
+    getSiteSP().web.lists.getByTitle(this.props.listName).currentUserHasPermissions(PermissionKind.EditListItems).then((value) => {
       this.setState({
         canUserEditListItems: value
       });
