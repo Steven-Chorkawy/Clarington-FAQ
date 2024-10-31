@@ -10,6 +10,7 @@ import "@pnp/sp/taxonomy";
 import { Link, MessageBar, MessageBarType, SearchBox } from 'office-ui-fabric-react';
 import { filterBy } from '@progress/kendo-data-query';
 import { PermissionKind } from "@pnp/sp/security";
+import PackageSolutionVersion from '../../../MyComponents/PackageSolutionVersion';
 
 const MOC_ORG_GROUP_ID = '4026b60c-6222-432f-b07d-89c2396e8e64';
 const DEPARTMENT_TERM_SET_ID = '8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f';
@@ -31,7 +32,6 @@ export default class FaqAccordion extends React.Component<IFaqAccordionProps, an
     }).catch(reason => console.error(reason));
   }
 
-  // TODO: This method should query any managed metadata field not just a department field.
   private async _queryDepartmentName(termID: string): Promise<void> {
     if (!termID)
       return;
@@ -148,7 +148,7 @@ export default class FaqAccordion extends React.Component<IFaqAccordionProps, an
                           <div>
                             <MessageBar messageBarType={MessageBarType.success} isMultiline={false}>
                               You have permissions to edit this list item.
-                              <Link href={`${this.props.siteUrl}/Lists/${this.props.listName}/EditForm.aspx?ID=${item.ID}`} title={`Open "${this.props.siteUrl}/Lists/${this.props.listName}/EditForm.aspx?ID=${item.ID}" in a new tab.`}target="_blank" underline>
+                              <Link href={`${this.props.siteUrl}/Lists/${this.props.listName}/EditForm.aspx?ID=${item.ID}`} title={`Open "${this.props.siteUrl}/Lists/${this.props.listName}/EditForm.aspx?ID=${item.ID}" in a new tab.`} target="_blank" underline>
                                 Click Here to Edit Item.
                               </Link>
                             </MessageBar>
@@ -162,6 +162,7 @@ export default class FaqAccordion extends React.Component<IFaqAccordionProps, an
               </Reveal>
             </ExpansionPanel>
           ))}
+          <PackageSolutionVersion />
         </div>
       );
     }
