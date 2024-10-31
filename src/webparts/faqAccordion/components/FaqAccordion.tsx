@@ -48,9 +48,10 @@ export default class FaqAccordion extends React.Component<IFaqAccordionProps, an
           // Replace the Department object with a simple string of the department name.  
           // This will make searching and rendering this info much easier.
           this.state.items.map((item: any, index: number) => {
-            if (item.Department?.TermGuid === termID) {
-              item.DepartmentDate = { ...item.Department }
-              item.Department = res.labels[0].name
+            if (item[this.props.subtitleFieldName]?.TermGuid === termID) {
+              // ? What is DepartmentDate used for?
+              // item.DepartmentDate = { ...item.Department }
+              item[this.props.subtitleFieldName] = res.labels[0].name
             }
           });
         }
@@ -62,12 +63,14 @@ export default class FaqAccordion extends React.Component<IFaqAccordionProps, an
     const listItems = await getSiteSP().web.lists.getByTitle(this.props.listName).items.getAll();
 
     listItems.forEach(item => {
-      this._queryDepartmentName(item.Department?.TermGuid).then().catch(reason => console.error(reason));
+      this._queryDepartmentName(item[this.props.subtitleFieldName]?.TermGuid);
     });
 
     // Sort by Created date.  Newest to Oldest.
     const sortedList = listItems.sort((p1, p2) => (p1.Created < p2.Created) ? 1 : (p1.Created > p2.Created) ? -1 : 0);
 
+    console.log('Items');
+    console.log(sortedList);
     this.setState({
       items: sortedList,    // items that will be rendered. 
       allItems: sortedList  // All items regardless of current filters.
@@ -109,7 +112,7 @@ export default class FaqAccordion extends React.Component<IFaqAccordionProps, an
       return (
         <div>
           <h2>{this.props.description}</h2>
-          <SearchBox placeholder={`Search by Question, Answer, Department, or Topic.`} onChange={(event, newValue) => this._onSearch(newValue)} />
+          <SearchBox placeholder={`Search by Question, Answer, ${this.props.subtitleFieldName}, or Topic.`} onChange={(event, newValue) => this._onSearch(newValue)} />
           {this.state.items.map((item: any, index: number) => (
             <ExpansionPanel
               title={item[this.props.questionFieldName]}
