@@ -5,9 +5,9 @@
     "nodeVersion": "16.18.1",
     "sdksVersions": {
       "@microsoft/microsoft-graph-client": "3.0.2",
-      "@microsoft/teams-js": "2.9.1"
+      "@microsoft/teams-js": "2.24.0"
     },
-    "version": "1.17.2",
+    "version": "1.20.0",
     "libraryName": "clarington-faq",
     "libraryId": "be13e6b7-0a2b-4420-867a-20626dbf7c70",
     "environment": "spo",

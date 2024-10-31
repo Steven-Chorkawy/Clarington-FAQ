@@ -21,14 +21,14 @@ export default class FaqAccordion extends React.Component<IFaqAccordionProps, an
     this.state = {
       items: undefined,
     };
-    this._queryList();
+    this._queryList().then().catch(reason => console.error(reason));
 
     // Check users permissions. 
     getSiteSP().web.lists.getByTitle('FAQ').currentUserHasPermissions(PermissionKind.EditListItems).then((value) => {
       this.setState({
         canUserEditListItems: value
       });
-    });
+    }).catch(reason => console.error(reason));
   }
 
   // TODO: This method should query any managed metadata field not just a department field.
@@ -38,7 +38,7 @@ export default class FaqAccordion extends React.Component<IFaqAccordionProps, an
 
     // check if state has already been set. 
     if (!this.state[termID]) {
-      let res = await getSiteSP().termStore.groups.getById(MOC_ORG_GROUP_ID).sets.getById(DEPARTMENT_TERM_SET_ID).getTermById(termID)();
+      const res = await getSiteSP().termStore.groups.getById(MOC_ORG_GROUP_ID).sets.getById(DEPARTMENT_TERM_SET_ID).getTermById(termID)();
 
       if (res.labels) {
         if (res.labels.length > 0) {
@@ -48,9 +48,10 @@ export default class FaqAccordion extends React.Component<IFaqAccordionProps, an
           // Replace the Department object with a simple string of the department name.  
           // This will make searching and rendering this info much easier.
           this.state.items.map((item: any, index: number) => {
-            if (item.Department?.TermGuid === termID) {
-              item.DepartmentDate = { ...item.Department }
-              item.Department = res.labels[0].name
+            if (item[this.props.subtitleFieldName]?.TermGuid === termID) {
+              // ? What is DepartmentDate used for?
+              // item.DepartmentDate = { ...item.Department }
+              item[this.props.subtitleFieldName] = res.labels[0].name
             }
           });
         }
@@ -62,7 +63,7 @@ export default class FaqAccordion extends React.Component<IFaqAccordionProps, an
     const listItems = await getSiteSP().web.lists.getByTitle(this.props.listName).items.getAll();
 
     listItems.forEach(item => {
-      this._queryDepartmentName(item.Department?.TermGuid);
+      this._queryDepartmentName(item[this.props.subtitleFieldName]?.TermGuid);
     });
 
     // Sort by Created date.  Newest to Oldest.
@@ -77,7 +78,7 @@ export default class FaqAccordion extends React.Component<IFaqAccordionProps, an
   componentDidUpdate(prevProps: Readonly<IFaqAccordionProps>, prevState: Readonly<any>, snapshot?: any): void {
     if (this.props.siteUrl !== prevProps.siteUrl ||
       this.props.listName !== prevProps.listName) {
-      this._queryList();
+      this._queryList().then().catch(reason => console.error(reason));
     }
   }
 
@@ -98,7 +99,6 @@ export default class FaqAccordion extends React.Component<IFaqAccordionProps, an
       newListItems = this.state.allItems;
     }
 
-    debugger;
     this.setState({ items: newListItems });
   }
 
@@ -110,7 +110,18 @@ export default class FaqAccordion extends React.Component<IFaqAccordionProps, an
       return (
         <div>
           <h2>{this.props.description}</h2>
-          <SearchBox placeholder={`Search by Question, Answer, Department, or Topic.`} onChange={(event, newValue) => this._onSearch(newValue)} />
+          {
+            this.state.canUserEditListItems &&
+            <div style={{ marginBottom: '10px' }}>
+              <MessageBar messageBarType={MessageBarType.success} isMultiline={false}>
+                You have permissions to add new list item.
+                <Link href={`${this.props.siteUrl}/Lists/${this.props.listName}/NewForm.aspx`} title={`Open "${this.props.siteUrl}/Lists/${this.props.listName}/NewForm.aspx" in a new tab.`} target="_blank" underline>
+                  Click Here to Add New Item.
+                </Link>
+              </MessageBar>
+            </div>
+          }
+          <SearchBox style={{ marginBottom: '10px' }} placeholder={`Search by Question, Answer, ${this.props.subtitleFieldName}, or Topic.`} onChange={(event, newValue) => this._onSearch(newValue)} />
           {this.state.items.map((item: any, index: number) => (
             <ExpansionPanel
               title={item[this.props.questionFieldName]}
@@ -137,7 +148,7 @@ export default class FaqAccordion extends React.Component<IFaqAccordionProps, an
                           <div>
                             <MessageBar messageBarType={MessageBarType.success} isMultiline={false}>
                               You have permissions to edit this list item.
-                              <Link href={`${this.props.siteUrl}/Lists/${this.props.listName}/EditForm.aspx?ID=${item.ID}`} target="_blank" underline>
+                              <Link href={`${this.props.siteUrl}/Lists/${this.props.listName}/EditForm.aspx?ID=${item.ID}`} title={`Open "${this.props.siteUrl}/Lists/${this.props.listName}/EditForm.aspx?ID=${item.ID}" in a new tab.`}target="_blank" underline>
                                 Click Here to Edit Item.
                               </Link>
                             </MessageBar>

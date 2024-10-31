@@ -120,6 +120,7 @@ export default class FaqAccordionWebPart extends BaseClientSideWebPart<IFaqAccor
 
       return "";
     } catch (error) {
+      console.error(error);
       return errorMessage;
     }
   }
@@ -136,6 +137,7 @@ export default class FaqAccordionWebPart extends BaseClientSideWebPart<IFaqAccor
         return errorMessage;
       }
     } catch (error) {
+      console.error(error);
       return errorMessage;
     }
   }
