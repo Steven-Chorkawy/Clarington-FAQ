@@ -69,8 +69,6 @@ export default class FaqAccordion extends React.Component<IFaqAccordionProps, an
     // Sort by Created date.  Newest to Oldest.
     const sortedList = listItems.sort((p1, p2) => (p1.Created < p2.Created) ? 1 : (p1.Created > p2.Created) ? -1 : 0);
 
-    console.log('Items');
-    console.log(sortedList);
     this.setState({
       items: sortedList,    // items that will be rendered. 
       allItems: sortedList  // All items regardless of current filters.
@@ -112,7 +110,18 @@ export default class FaqAccordion extends React.Component<IFaqAccordionProps, an
       return (
         <div>
           <h2>{this.props.description}</h2>
-          <SearchBox placeholder={`Search by Question, Answer, ${this.props.subtitleFieldName}, or Topic.`} onChange={(event, newValue) => this._onSearch(newValue)} />
+          {
+            this.state.canUserEditListItems &&
+            <div style={{ marginBottom: '10px' }}>
+              <MessageBar messageBarType={MessageBarType.success} isMultiline={false}>
+                You have permissions to add new list item.
+                <Link href={`${this.props.siteUrl}/Lists/${this.props.listName}/NewForm.aspx`} title={`Open "${this.props.siteUrl}/Lists/${this.props.listName}/NewForm.aspx" in a new tab.`} target="_blank" underline>
+                  Click Here to Add New Item.
+                </Link>
+              </MessageBar>
+            </div>
+          }
+          <SearchBox style={{ marginBottom: '10px' }} placeholder={`Search by Question, Answer, ${this.props.subtitleFieldName}, or Topic.`} onChange={(event, newValue) => this._onSearch(newValue)} />
           {this.state.items.map((item: any, index: number) => (
             <ExpansionPanel
               title={item[this.props.questionFieldName]}
@@ -139,7 +148,7 @@ export default class FaqAccordion extends React.Component<IFaqAccordionProps, an
                           <div>
                             <MessageBar messageBarType={MessageBarType.success} isMultiline={false}>
                               You have permissions to edit this list item.
-                              <Link href={`${this.props.siteUrl}/Lists/${this.props.listName}/EditForm.aspx?ID=${item.ID}`} target="_blank" underline>
+                              <Link href={`${this.props.siteUrl}/Lists/${this.props.listName}/EditForm.aspx?ID=${item.ID}`} title={`Open "${this.props.siteUrl}/Lists/${this.props.listName}/EditForm.aspx?ID=${item.ID}" in a new tab.`}target="_blank" underline>
                                 Click Here to Edit Item.
                               </Link>
                             </MessageBar>

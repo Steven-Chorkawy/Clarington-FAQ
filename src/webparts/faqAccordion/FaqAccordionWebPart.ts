@@ -129,7 +129,6 @@ export default class FaqAccordionWebPart extends BaseClientSideWebPart<IFaqAccor
     const errorMessage = `Cannot locate Site '${siteUrl}'...`
     try {
       const site = await getSP().site.exists(siteUrl);
-      debugger;
       if (site) {
         getSiteSP(this.context, siteUrl);
         return '';
