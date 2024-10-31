@@ -98,7 +98,6 @@ export default class FaqAccordion extends React.Component<IFaqAccordionProps, an
       newListItems = this.state.allItems;
     }
 
-    debugger;
     this.setState({ items: newListItems });
   }
 
