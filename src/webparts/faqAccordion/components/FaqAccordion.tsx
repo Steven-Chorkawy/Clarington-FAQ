@@ -21,14 +21,14 @@ export default class FaqAccordion extends React.Component<IFaqAccordionProps, an
     this.state = {
       items: undefined,
     };
-    this._queryList();
+    this._queryList().then().catch(reason => console.error(reason));
 
     // Check users permissions. 
     getSiteSP().web.lists.getByTitle('FAQ').currentUserHasPermissions(PermissionKind.EditListItems).then((value) => {
       this.setState({
         canUserEditListItems: value
       });
-    });
+    }).catch(reason => console.error(reason));
   }
 
   // TODO: This method should query any managed metadata field not just a department field.
@@ -38,7 +38,7 @@ export default class FaqAccordion extends React.Component<IFaqAccordionProps, an
 
     // check if state has already been set. 
     if (!this.state[termID]) {
-      let res = await getSiteSP().termStore.groups.getById(MOC_ORG_GROUP_ID).sets.getById(DEPARTMENT_TERM_SET_ID).getTermById(termID)();
+      const res = await getSiteSP().termStore.groups.getById(MOC_ORG_GROUP_ID).sets.getById(DEPARTMENT_TERM_SET_ID).getTermById(termID)();
 
       if (res.labels) {
         if (res.labels.length > 0) {
@@ -62,7 +62,7 @@ export default class FaqAccordion extends React.Component<IFaqAccordionProps, an
     const listItems = await getSiteSP().web.lists.getByTitle(this.props.listName).items.getAll();
 
     listItems.forEach(item => {
-      this._queryDepartmentName(item.Department?.TermGuid);
+      this._queryDepartmentName(item.Department?.TermGuid).then().catch(reason => console.error(reason));
     });
 
     // Sort by Created date.  Newest to Oldest.
@@ -77,7 +77,7 @@ export default class FaqAccordion extends React.Component<IFaqAccordionProps, an
   componentDidUpdate(prevProps: Readonly<IFaqAccordionProps>, prevState: Readonly<any>, snapshot?: any): void {
     if (this.props.siteUrl !== prevProps.siteUrl ||
       this.props.listName !== prevProps.listName) {
-      this._queryList();
+      this._queryList().then().catch(reason => console.error(reason));
     }
   }
 

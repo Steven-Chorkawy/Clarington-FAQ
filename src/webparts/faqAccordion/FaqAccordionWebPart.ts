@@ -49,7 +49,7 @@ export default class FaqAccordionWebPart extends BaseClientSideWebPart<IFaqAccor
   protected async onInit(): Promise<void> {
     this._environmentMessage = await this._getEnvironmentMessage();
 
-    super.onInit();
+    await super.onInit();
 
     //Initialize our _sp object that we can then use in other packages without having to pass around the context.
     //  Check out pnpjsConfig.ts for an example of a project setup file.
@@ -120,6 +120,7 @@ export default class FaqAccordionWebPart extends BaseClientSideWebPart<IFaqAccor
 
       return "";
     } catch (error) {
+      console.error(error);
       return errorMessage;
     }
   }
@@ -136,6 +137,7 @@ export default class FaqAccordionWebPart extends BaseClientSideWebPart<IFaqAccor
         return errorMessage;
       }
     } catch (error) {
+      console.error(error);
       return errorMessage;
     }
   }
