@@ -49,7 +49,7 @@ export default class FaqAccordionWebPart extends BaseClientSideWebPart<IFaqAccor
   protected async onInit(): Promise<void> {
     this._environmentMessage = await this._getEnvironmentMessage();
 
-    await super.onInit();
+    super.onInit();
 
     //Initialize our _sp object that we can then use in other packages without having to pass around the context.
     //  Check out pnpjsConfig.ts for an example of a project setup file.
@@ -129,6 +129,7 @@ export default class FaqAccordionWebPart extends BaseClientSideWebPart<IFaqAccor
     const errorMessage = `Cannot locate Site '${siteUrl}'...`
     try {
       const site = await getSP().site.exists(siteUrl);
+      debugger;
       if (site) {
         getSiteSP(this.context, siteUrl);
         return '';
