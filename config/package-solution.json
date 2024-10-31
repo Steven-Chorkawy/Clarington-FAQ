@@ -3,7 +3,7 @@
   "solution": {
     "name": "clarington-faq-client-side-solution",
     "id": "be13e6b7-0a2b-4420-867a-20626dbf7c70",
-    "version": "2.0.0.2",
+    "version": "3.0.0.2",
     "includeClientSideAssets": true,
     "skipFeatureDeployment": true,
     "isDomainIsolated": false,
